@@ -69,7 +69,7 @@ public class NotificationListener implements NotifyListener{
 
 	@Override
 	public void onGameStarted(String sender, String roomId, String nextTurn) {
-		callBack.onGameStarted(roomId, nextTurn);
+		callBack.onGameStarted(sender, roomId, nextTurn);
 	}
 
 	@Override

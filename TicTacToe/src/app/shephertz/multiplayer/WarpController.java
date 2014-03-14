@@ -145,8 +145,8 @@ public class WarpController {
 		}
 	}
 	
-	public void onGameStarted(String roomId, String userName){
-		activity.startGame(userName);
+	public void onGameStarted(String sender, String roomId, String nextTurn){
+		activity.startGame(nextTurn);
 	}
 	
 	public void onGameStopped(String roomId, String userName){
@@ -154,9 +154,7 @@ public class WarpController {
 	}
 
 	public void onMoveCompleted(String moveData, String sender, String nextTurn){
-		if(!sender.equals(Util.UserName)){
-			activity.onMoveCompleted(moveData, nextTurn);
-		}
+		activity.onMoveCompleted(moveData, sender, nextTurn);
 	}
 
 

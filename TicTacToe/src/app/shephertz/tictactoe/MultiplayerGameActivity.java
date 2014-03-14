@@ -1,24 +1,18 @@
 package app.shephertz.tictactoe;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import app.shephertz.multiplayer.WarpController;
 
 public class MultiplayerGameActivity extends Activity implements OnTouchListener{
@@ -114,7 +108,6 @@ public class MultiplayerGameActivity extends Activity implements OnTouchListener
 		              updateUI(i, j, TYPE);
 		            }
 					checkGameComplete(i, j);
-					
 				}
 			}
 		}
@@ -160,14 +153,13 @@ public class MultiplayerGameActivity extends Activity implements OnTouchListener
 		});
 	}
 	
-	public void startGame(final String text){
+	public void startGame(final String turnUser){
 		isGameStarted = true;
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				if(text.equals(Util.UserName)){
+				if(turnUser.equals(Util.UserName)){
 					isUserTurn = true;
-					notificationTextView.setText(text);
 					notificationTextView.setText("Your Turn");
 				}else{
 					isUserTurn = false;
@@ -179,17 +171,39 @@ public class MultiplayerGameActivity extends Activity implements OnTouchListener
 	
 	@Override
 	public void onBackPressed() {
+		isGameStarted = false;
+		isUserTurn = false;
 		WarpController.getInstance().stopApp();
 		super.onBackPressed();
 	}
 	
-	public void onMoveCompleted(String moveData, final String nextTurn){
-		final int i = Integer.parseInt(moveData.substring(0,moveData.indexOf('#')));
-		final int j = Integer.parseInt(moveData.substring(moveData.indexOf('#')+1, moveData.indexOf('/')));
-		final String data = moveData.substring(moveData.indexOf('#')+1, moveData.length());
+	public void onMoveCompleted(final String moveData, final String sender, final String nextTurn){
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
+				if(!sender.equals(Util.UserName) && moveData.length()>0){
+					final int i = Integer.parseInt(moveData.substring(0,moveData.indexOf('#')));
+					final int j = Integer.parseInt(moveData.substring(moveData.indexOf('#')+1, moveData.indexOf('/')));
+					final String data = moveData.substring(moveData.indexOf('#')+1, moveData.length());
+					if(TYPE=='0'){
+						updateUI(i, j, 'X');
+					}else{
+						updateUI(i, j, '0');
+					}
+					if(data.trim().length()>0){
+						if(data.indexOf("Win")!=-1){
+							isGameStarted = false;
+							showResultDialog("Oops! You Loose");
+						}
+						if(data.indexOf("Loose")!=-1){
+							isGameStarted = false;
+							showResultDialog("Congrats! You Win");
+						}
+					}
+						
+				}else{
+					// empty move
+				}
 				if(nextTurn.equals(Util.UserName)){
 					isUserTurn = true;
 					notificationTextView.setText("Your Turn");
@@ -197,23 +211,9 @@ public class MultiplayerGameActivity extends Activity implements OnTouchListener
 					isUserTurn = false;
 					notificationTextView.setText("Enemy Turn");
 				}
-				if(TYPE=='0'){
-					updateUI(i, j, 'X');
-				}else{
-					updateUI(i, j, '0');
-				}
-				if(data.trim().length()>0){
-					if(data.indexOf("Win")!=-1){
-						isGameStarted = false;
-						showResultDialog("Oops! You Loose");
-					}
-					if(data.indexOf("Loose")!=-1){
-						isGameStarted = false;
-						showResultDialog("Congrats! You Win");
-					}
-				}
 			}
 		});
+		
 	}
 	
 	public void onEnemyLeft(){
@@ -225,8 +225,6 @@ public class MultiplayerGameActivity extends Activity implements OnTouchListener
 				}
 			});
 		}
-		
 	}
-	
 	
 }
